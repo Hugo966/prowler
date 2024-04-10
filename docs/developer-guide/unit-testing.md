@@ -593,4 +593,227 @@ class Test_defender_ensure_defender_for_arm_is_on:
 
 ### Services
 
-Coming soon ...
+For the Azure Services tests, the idea is similar, we test that the functions we've done for capturing the values of the different objects using the Azure API work correctly. Again, we create an object instance and verify that the values captured for that instance are correct.
+
+The following code shows how a service test looks like.
+
+```python
+
+#We import patch from unittest.mock for simulating objects, the ones that we'll test with.
+from unittest import mock
+from unittest.mock import MagicMock, patch
+
+#We import the AZURE_SUBSCRIPTION_ID for checking it and the Azure provider(*)
+from tests.providers.azure.azure_fixtures import (
+    AZURE_SUBSCRIPTION_ID,
+    set_mocked_azure_provider,
+)
+
+#We create tha class with testing purposes
+class Test_keyvault_service:
+    #We create the function, simulating the corresponding object and asserting if something does not go as we expect
+    def test_keyvault_service_(self):
+        #Importing provider and client
+        with patch(
+            "prowler.providers.common.common.get_global_provider",
+            return_value=set_mocked_azure_provider(),
+        ), patch(
+            "prowler.providers.azure.services.monitor.monitor_service.Monitor",
+            new=MagicMock(),
+        ):
+            #Importing classes that are going to be needed for testing
+            from prowler.providers.azure.services.keyvault.keyvault_service import (  # KeyVault,
+                DiagnosticSetting,
+                Key,
+                KeyVaultInfo,
+                Secret,
+            )
+
+            # keyvault = KeyVault(set_mocked_azure_provider())
+            keyvault = MagicMock()
+
+            #We set the parameters as we wish for testing purposes
+            keyvault.key_vaults = {
+                AZURE_SUBSCRIPTION_ID: [
+                    KeyVaultInfo(
+                        id="id",
+                        name="name",
+                        location="location",
+                        resource_group="resource_group",
+                        properties=None,
+                        keys=[
+                            Key(
+                                id="id",
+                                name="name",
+                                enabled=True,
+                                location="location",
+                                attributes=None,
+                                rotation_policy=None,
+                            )
+                        ],
+                        secrets=[
+                            Secret(
+                                id="id",
+                                name="name",
+                                enabled=True,
+                                location="location",
+                                attributes=None,
+                            )
+                        ],
+                        monitor_diagnostic_settings=[
+                            DiagnosticSetting(
+                                id="id",
+                                storage_account_id="storage_account_id",
+                                logs=[
+                                    mock.MagicMock(
+                                        categoty_group="audit",
+                                        category="None",
+                                        enabled=True,
+                                    ),
+                                    mock.MagicMock(
+                                        categoty_group="allLogs",
+                                        category="None",
+                                        enabled=False,
+                                    ),
+                                ],
+                                name="name",
+                                storage_account_name="storage_account_name",
+                            )
+                        ],
+                    )
+                ]
+            }
+
+            #If something does not go as it should, we assert, the check has failed the test
+            #If execution is completed without assertions, the check has passed the test
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].__class__.__name__
+                == "KeyVaultInfo"
+            )
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].id == "id"
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].name == "name"
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].location == "location"
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].resource_group
+                == "resource_group"
+            )
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].properties is None
+
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].__class__.__name__
+                == "Key"
+            )
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].id == "id"
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].name == "name"
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].enabled is True
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].location
+                == "location"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].attributes is None
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].keys[0].rotation_policy
+                is None
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .secrets[0]
+                .__class__.__name__
+                == "Secret"
+            )
+            assert keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].id == "id"
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].name == "name"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].enabled is True
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].location
+                == "location"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].attributes
+                is None
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0].secrets[0].attributes
+                is None
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .id
+                == "id"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .storage_account_id
+                == "storage_account_id"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[0]
+                .categoty_group
+                == "audit"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[0]
+                .category
+                == "None"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[0]
+                .enabled
+                is True
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[1]
+                .categoty_group
+                == "allLogs"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[1]
+                .category
+                == "None"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .logs[1]
+                .enabled
+                is False
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .name
+                == "name"
+            )
+            assert (
+                keyvault.key_vaults[AZURE_SUBSCRIPTION_ID][0]
+                .monitor_diagnostic_settings[0]
+                .storage_account_name
+                == "storage_account_name"
+            )
+
+
+
+```
+(*)for more details check the [Provider](./provider.md) section.
+
+Hopefully this will result useful for understanding and creating new Azure Services checks.
+
+Please refer to the [Azure checks tests](./unit-testing.md#azure) for more information on how to create tests and checks for the [existing Azure services](https://github.com/prowler-cloud/prowler/tree/master/tests/providers/azure/services) 
